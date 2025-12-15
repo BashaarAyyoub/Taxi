@@ -1,4 +1,3 @@
-# main.py
 import random
 import threading
 import time
@@ -21,7 +20,7 @@ def read_positive_int(prompt: str) -> int:
 
 
 def resumen_final(sistema: Sistema):
-    # snapshot seguro de taxis
+ 
     sistema.sem_taxis.acquire()
     try:
         taxis = list(sistema.taxis)
@@ -64,17 +63,17 @@ def main():
 
     sistema = Sistema(taxis)
 
-    # Reloj 24h
+    #teloj 24h
     clock = threading.Thread(target=sistema.clock_loop)
     clock.start()
 
-    # Clientes persistentes
+    #clientes persistentes
     clients = [Cliente(sistema, client_id=i + 1) for i in range(n_clients)]
 
     for c in clients:
         c.start()
 
-    # Esperar fin del día + servicios activos == 0
+    #esperar fin del día + servicios activos == 0
     while True:
         finished = sistema.is_day_finished()
         active = sistema.active_services()

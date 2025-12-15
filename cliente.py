@@ -1,4 +1,3 @@
-# cliente.py
 import math
 import random
 import threading
@@ -25,13 +24,13 @@ class Cliente(threading.Thread):
         self.client_id = client_id
 
     def run(self):
-        # Desfase inicial suave para que no arranquen todos a la vez
+        #desfase inicial suave para que no arranquen todos a la vez
         self.sistema.sleep_minutes(random.randint(0, 10))
 
         while True:
             now = self.sistema.now_minute()
             if now >= DAY_MINUTES or self.sistema.is_day_finished():
-                break  # no iniciar viajes nuevos tras 24:00
+                break  #no iniciar viajes nuevos tras terminar el día
 
             ox, oy = self.sistema.rand_point()
             dx, dy = self.sistema.rand_point()
@@ -45,11 +44,11 @@ class Cliente(threading.Thread):
 
             start = self.sistema.now_minute()
             duration = max(1, self.sistema.tri_int(TRIP_MIN, TRIP_MODE, TRIP_MAX))
-            end = start + duration  # puede pasar de 24:00
+            end = start + duration  #puede pasar de 24:00
 
             self.sistema.begin_service()
 
-            # Imprimir inicio + estado taxis
+            #imprimir inicio + estado taxis
             self.sistema.sem_print.acquire()
             try:
                 libres, ocupados = self.sistema.taxi_status_snapshot()
@@ -64,16 +63,16 @@ class Cliente(threading.Thread):
             finally:
                 self.sistema.sem_print.release()
 
-            # Simular el viaje
+            #simular el viaje
             self.sistema.sleep_minutes(duration)
 
-            # Finalizar y actualizar
+            #finalizar y actualizar
             rating = random.randint(1, 5)
             fare = self.sistema.compute_fare(distance)
             self.sistema.finish_trip(taxi, dx, dy, fare, rating)
             self.sistema.end_service()
 
-            # Imprimir fin + estado taxis
+            #imprimir fin + estado taxis
             self.sistema.sem_print.acquire()
             try:
                 libres, ocupados = self.sistema.taxi_status_snapshot()
@@ -86,6 +85,6 @@ class Cliente(threading.Thread):
             finally:
                 self.sistema.sem_print.release()
 
-            # Espera razonable antes del siguiente viaje
+            #espera razonable antes del siguiente viaje
             wait = max(1, self.sistema.tri_int(WAIT_MIN, WAIT_MODE, WAIT_MAX))
             self.sistema.sleep_minutes(wait)
